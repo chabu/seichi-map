@@ -1,0 +1,16 @@
+{
+  "name": "作品タイトル",
+  "copyrights": ["&copy; 権利者名"],
+  "points": [
+    {
+      "latlng": [34.4205658, 134.0536327],
+      "icon": "thumbs/kv.jpg",
+      "orig": "kv.jpg",
+      "text": "キービジュ"
+    },
+    {
+      "latlng": [34.4568781, 133.9740912],
+      "icon": "ep1m2s34.jpg"
+    }
+  ]
+}
