@@ -19,7 +19,7 @@ https://chabu.sakura.ne.jp/common/map.html?base=/2022/11/08/summer-pockets/
 ## 設置方法
 - 地図の表示に必要なファイルを展開します。
   - 例: /
-    - map.html（アクセストークンを自分のものに書き換えてください）
+    - map.html（アクセストークンを書き換えてください）
     - map.css
     - mapbox.js
     - licenses.txt
@@ -32,8 +32,8 @@ https://chabu.sakura.ne.jp/common/map.html?base=/2022/11/08/summer-pockets/
 ### JSONフォーマット
 - points 配列
   - `orig`が存在すれば、クリックでそちらを表示します。
-  - `away`が`true`であれば初期状態で表示しません。
-  - `latlng`を空配列にすると処理をスキップします。
+  - `away`が`true`であれば、初期状態で表示しません。
+  - `latlng`を空配列にすると、処理をスキップします。
 
 ```json
 {
