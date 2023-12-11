@@ -1,11 +1,11 @@
-const version = "0.88a";
+const version = "0.89a";
 
 class Util {
 	static styles = [
-		// Mapbox Streets 202302
-		"mapbox://styles/chabu/cle45fdmb000b01mg52anpyee",
-		// Mapbox Satellite Streets 202302 (3D Terrain enabled)
-		"mapbox://styles/chabu/cle45tmjz000c01mgr0hm1aix",
+		// Mapbox Streets Noto Sans
+		"mapbox://styles/chabu/clq0rd1iu00kf01q15bwm4s8o",
+		// Mapbox Satellite Streets Noto Sans (3D Terrain enabled)
+		"mapbox://styles/chabu/clq0ss0d500ke01px8wppg2xu",
 	];
 
 	static paddingOptions = {
