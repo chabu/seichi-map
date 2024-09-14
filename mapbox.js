@@ -1,11 +1,30 @@
-const version = "0.91a";
+const version = "0.93a";
 
 class Util {
 	static styles = [
-		// Mapbox Streets Noto Sans
-		"mapbox://styles/chabu/clq0rd1iu00kf01q15bwm4s8o",
-		// Mapbox Satellite Streets Noto Sans (3D Terrain enabled)
-		"mapbox://styles/chabu/clq0ss0d500ke01px8wppg2xu",
+		// Mapbox Standard
+		{
+			url: "mapbox://styles/mapbox/standard",
+			config: {
+				basemap: {
+					font: "Noto Sans CJK JP",
+					theme: "faded",
+					lightPreset: "night",
+					show3dObjects: false,
+				}
+			}
+		},
+
+		//Mapbox Standard Satellite
+		{
+			url: "mapbox://styles/mapbox/standard-satellite",
+			config: {
+				basemap: {
+					font: "Noto Sans CJK JP",
+					lightPreset: "day",
+				}
+			}
+		}
 	];
 
 	static paddingOptions = {
@@ -315,13 +334,16 @@ class MapStyleControl {
 		button.addEventListener("click", () => {
 			this.#stylesIndex++;
 			this.#stylesIndex %= this.#styles.length;
-			this.#map.setStyle(this.#styles[this.#stylesIndex]);
+			this.#map.setStyle(
+				this.#styles[this.#stylesIndex].url,
+				{config: this.#styles[this.#stylesIndex].config}
+			);
 
 			const span = document.getElementById("status");
 			span.textContent = "loading...";
 
+			this.#appender.loadImages();
 			this.#map.once("idle", () => {
-				this.#appender.loadImages();
 				this.#appender.loadSourceAndLayer();
 			});
 		});
@@ -725,12 +747,13 @@ json.copyrights.unshift(
 const map = new mapboxgl.Map({
 	accessToken: divMap.dataset.token,
 	bounds: llbNear,
+	config: Util.styles[0].config,
 	container: divMap,
 	customAttribution: json.copyrights,
 	fitBoundsOptions: {padding: Util.paddingOptions},
 	language: "auto",
 	//performanceMetricsCollection: false,
-	style: Util.styles[0],
+	style: Util.styles[0].url,
 	worldview: "JP",
 });
 
@@ -740,7 +763,7 @@ const appender = new PointsAppender(map, geoJson);
 appender.bindEventListeners();
 appender.loadImages();
 
-map.on("load", () => {
+map.once("load", () => {
 	appender.loadSourceAndLayer();
 });
 
