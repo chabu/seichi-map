@@ -1,4 +1,4 @@
-const version = "0.93a";
+const version = "0.94a";
 
 class Util {
 	static styles = [
@@ -15,13 +15,13 @@ class Util {
 			}
 		},
 
-		//Mapbox Standard Satellite
+		// Mapbox Standard Satellite
 		{
 			url: "mapbox://styles/mapbox/standard-satellite",
 			config: {
 				basemap: {
 					font: "Noto Sans CJK JP",
-					lightPreset: "day",
+					lightPreset: "dusk",
 				}
 			}
 		}
@@ -218,7 +218,7 @@ class Button2Control {
 				center: {lat: 34.420173, lng: 134.056573},
 				zoom: 16.40,
 				bearing: 122.3,
-				pitch: 60
+				pitch: 60,
 			});
 		});
 
@@ -248,7 +248,6 @@ class Button3Control {
 		button.className = "button";
 		button.textContent = "Button 3";
 		button.addEventListener("click", () => {
-
 		});
 
 		div.appendChild(button);
@@ -287,7 +286,6 @@ class ShowAllControl {
 
 		button.addEventListener("click", () => {
 			this.#map.fitBounds(this.#lngLatBounds, {
-				//animate: false,
 				padding: Util.paddingOptions
 			});
 		});
@@ -384,7 +382,7 @@ class ImageOnOffControl {
 		icon.title = "image on/off";
 
 		button.addEventListener("click", () => {
-			const props = this.#appender.layoutProps(false);
+			const props = this.#appender.getLayoutProps(false);
 			for (const [key, value] of Object.entries(props)) {
 				this.#map.setLayoutProperty("points", key, value);
 			}
@@ -486,6 +484,11 @@ class PointsAppender {
 	async loadTriangle() {
 		const id = "inverted-triangle";
 
+		if (this.#map.hasImage(id)) {
+			console.warn("Already loaded", id);
+			return;
+		}
+
 		const color1 = "rgba(0 0 0 / 10%)";
 		const color2 = "rgb(255 255 255)";
 
@@ -514,12 +517,7 @@ class PointsAppender {
 		context.fill(path);
 
 		const bitmap = await createImageBitmap(canvas);
-
-		if (this.#map.hasImage(id)) {
-			console.warn("Already loaded", id);
-		} else {
-			this.#map.addImage(id, bitmap, {pixelRatio: 2});
-		}
+		this.#map.addImage(id, bitmap, {pixelRatio: 2});
 	}
 
 	loadImages() {
@@ -534,6 +532,11 @@ class PointsAppender {
 			this.#map.loadImage(filename, async (error, image) => {
 				if (error) {
 					console.error("Failed to load", error);
+					return;
+				}
+
+				if (this.#map.hasImage(filename)) {
+					console.warn("Already loaded", filename);
 					return;
 				}
 
@@ -596,17 +599,12 @@ class PointsAppender {
 				context.fillRect(8, boxHeight - 4, 32, 4);
 
 				const bitmap = await createImageBitmap(canvas);
-
-				if (this.#map.hasImage(filename)) {
-					console.warn("Already loaded", filename);
-				} else {
-					this.#map.addImage(filename, bitmap, {pixelRatio: 2});
-				}
+				this.#map.addImage(filename, bitmap, {pixelRatio: 2});
 			});
 		}
 	}
 
-	layoutProps(first) {
+	getLayoutProps(first) {
 		if (first === false) {
 			this.#layoutPropsIndex++;
 			this.#layoutPropsIndex %= this.#layoutProps.length;
@@ -631,11 +629,12 @@ class PointsAppender {
 		}
 
 		if (this.#map.getLayer("points") === undefined) {
-			const props = this.layoutProps(true);
+			const props = this.getLayoutProps(true);
 
 			this.#map.addLayer({
 				id: "points",
 				type: "symbol",
+				slot: "top",
 				source: "points",
 				paint: {
 					"text-color": "rgb(255, 255, 255)",
