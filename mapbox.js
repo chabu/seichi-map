@@ -1,4 +1,4 @@
-const version = "0.89a";
+const version = "0.91a";
 
 class Util {
 	static styles = [
@@ -16,17 +16,17 @@ class Util {
 	};
 
 	static labelFromUrl(url) {
-		let filename = url.split("/").pop();
-		let filenameNoExts = filename.split(".", 1).shift();
+		const filename = url.split("/").pop();
+		const filenameNoExts = filename.split(".", 1).shift();
 
 		let category = null, numseq = null;
 		let hour = null, minute = null, second = null;
 
-		let matches = filenameNoExts.matchAll(/([a-z]+)([0-9]+)/gs);
+		const matches = filenameNoExts.matchAll(/([a-z]+)([0-9]+)/gs);
 
-		for (let match of matches) {
-			let prefix = match[1];
-			let numval = match[2];
+		for (const match of matches) {
+			const prefix = match[1];
+			const numval = match[2];
 
 			switch (prefix) {
 				case "pv": // promotion
@@ -65,35 +65,34 @@ class Util {
 		}
 
 		if (hour === null) {
-			let padsec = second.padStart(2, "0");
+			const padsec = second.padStart(2, "0");
 			return `${groupLabel} ${minute}:${padsec}`;
 		} else {
-			let padsec = second.padStart(2, "0");
-			let padmin = minute.padStart(2, "0");
+			const padsec = second.padStart(2, "0");
+			const padmin = minute.padStart(2, "0");
 			return `${groupLabel} ${hour}:${padmin}:${padsec}`;
 		}
 	}
 
 	static goodLngLat(map, ll) {
-		let zoom = map.getZoom().toFixed(2);
-		let precision = Math.ceil((zoom * Math.LN2 + Math.log(512 / 360 / 0.5)) / Math.LN10);
+		const zoom = map.getZoom().toFixed(2);
+		const precision = Math.ceil((zoom * Math.LN2 + Math.log(512 / 360 / 0.5)) / Math.LN10);
 
-		let lng = ll.lng.toFixed(precision);
-		let lat = ll.lat.toFixed(precision);
+		const lng = ll.lng.toFixed(precision);
+		const lat = ll.lat.toFixed(precision);
 
 		return {lng: lng, lat: lat, zoom: zoom};
 	}
 
 	static positionText(map, title) {
-		let center = map.getCenter();
-		let ll = this.goodLngLat(map, center);
+		const center = map.getCenter();
+		const ll = this.goodLngLat(map, center);
 
-		let bearing = map.getBearing().toFixed(1);
-		let pitch = map.getPitch().toFixed(0);
+		const bearing = map.getBearing().toFixed(1);
+		const pitch = map.getPitch().toFixed(0);
 
 		// ${ll.zoom}/${ll.lat}/${ll.lng}/${bearing}/${pitch}
-		let text =
-`// ${title}
+		const text = `// ${title}
 "center": {"lat": ${ll.lat}, "lng": ${ll.lng}},
 "zoom": ${ll.zoom},
 "bearing": ${bearing},
@@ -103,17 +102,17 @@ class Util {
 	}
 
 	static convertToGeoJson(points, baseUrl) {
-		let root = {
+		const root = {
 			type: "FeatureCollection",
 			features: []
 		};
 
-		for (let point of points) {
+		for (const point of points) {
 			if (point["latlng"].length < 2) {
 				continue;
 			}
 
-			let children = {
+			const children = {
 				type: "Feature",
 				geometry: {
 					type: "Point",
@@ -127,17 +126,17 @@ class Util {
 				}
 			};
 
-			if (point.hasOwnProperty("text")) {
+			if (Object.hasOwn(point, "text")) {
 				children.properties.text = point["text"];
 			} else {
 				children.properties.text = this.labelFromUrl(point["icon"]);
 			}
 
-			if (point.hasOwnProperty("orig")) {
+			if (Object.hasOwn(point, "orig")) {
 				children.properties.orig = baseUrl + point["orig"];
 			}
 
-			if (point.hasOwnProperty("away")) {
+			if (Object.hasOwn(point, "away")) {
 				children.properties.away = point["away"];
 			} else {
 				children.properties.away = false;
@@ -157,14 +156,14 @@ class Button1Control {
 	onAdd(map) {
 		this.#map = map;
 
-		let div = document.createElement("div");
+		const div = document.createElement("div");
 		div.className = "mapboxgl-ctrl";
 
-		let button = document.createElement("span");
+		const button = document.createElement("span");
 		button.className = "button";
 		button.textContent = "Show Pos";
 		button.addEventListener("click", () => {
-			let element = document.getElementById("info");
+			const element = document.getElementById("info");
 			element.value = Util.positionText(this.#map, "Show Pos");
 			element.select();
 		});
@@ -188,10 +187,10 @@ class Button2Control {
 	onAdd(map) {
 		this.#map = map;
 
-		let div = document.createElement("div");
+		const div = document.createElement("div");
 		div.className = "mapboxgl-ctrl";
 
-		let button = document.createElement("span");
+		const button = document.createElement("span");
 		button.className = "button";
 		button.textContent = "Move";
 		button.addEventListener("click", () => {
@@ -223,14 +222,14 @@ class Button3Control {
 	onAdd(map) {
 		this.#map = map;
 
-		let div = document.createElement("div");
+		const div = document.createElement("div");
 		div.className = "mapboxgl-ctrl";
 
-		let button = document.createElement("span");
+		const button = document.createElement("span");
 		button.className = "button";
 		button.textContent = "Button 3";
 		button.addEventListener("click", () => {
-			
+
 		});
 
 		div.appendChild(button);
@@ -245,7 +244,7 @@ class Button3Control {
 	}
 }
 
-class DisplayAllControl {
+class ShowAllControl {
 	#map;
 	#container;
 	#lngLatBounds;
@@ -257,19 +256,19 @@ class DisplayAllControl {
 	onAdd(map) {
 		this.#map = map;
 
-		let div = document.createElement("div");
+		const div = document.createElement("div");
 		div.className = "mapboxgl-ctrl mapboxgl-ctrl-group";
 
-		let button = document.createElement("button");
+		const button = document.createElement("button");
 		button.type = "button";
 
-		let icon = document.createElement("span");
+		const icon = document.createElement("span");
 		icon.className = "mapboxgl-ctrl-icon icon-world";
-		icon.title = "Display all markers";
+		icon.title = "show all markers";
 
 		button.addEventListener("click", () => {
 			this.#map.fitBounds(this.#lngLatBounds, {
-				animate: false,
+				//animate: false,
 				padding: Util.paddingOptions
 			});
 		});
@@ -303,22 +302,22 @@ class MapStyleControl {
 	onAdd(map) {
 		this.#map = map;
 
-		let div = document.createElement("div");
+		const div = document.createElement("div");
 		div.className = "mapboxgl-ctrl mapboxgl-ctrl-group";
 
-		let button = document.createElement("button");
+		const button = document.createElement("button");
 		button.type = "button";
 
-		let icon = document.createElement("span");
+		const icon = document.createElement("span");
 		icon.className = "mapboxgl-ctrl-icon icon-layers";
-		icon.title = "Change map's style";
+		icon.title = "change map style";
 
 		button.addEventListener("click", () => {
 			this.#stylesIndex++;
 			this.#stylesIndex %= this.#styles.length;
 			this.#map.setStyle(this.#styles[this.#stylesIndex]);
 
-			let span = document.getElementById("status");
+			const span = document.getElementById("status");
 			span.textContent = "loading...";
 
 			this.#map.once("idle", () => {
@@ -340,7 +339,7 @@ class MapStyleControl {
 	}
 }
 
-class TogglePicturesControl {
+class ImageOnOffControl {
 	#map;
 	#container;
 	#appender;
@@ -352,19 +351,19 @@ class TogglePicturesControl {
 	onAdd(map) {
 		this.#map = map;
 
-		let div = document.createElement("div");
+		const div = document.createElement("div");
 		div.className = "mapboxgl-ctrl mapboxgl-ctrl-group";
 
-		let button = document.createElement("button");
+		const button = document.createElement("button");
 		button.type = "button";
 
-		let icon = document.createElement("span");
+		const icon = document.createElement("span");
 		icon.className = "mapboxgl-ctrl-icon icon-pictures";
-		icon.title = "Toggle pictures";
+		icon.title = "image on/off";
 
 		button.addEventListener("click", () => {
-			let props = this.#appender.layoutProps(false);
-			for (let [key, value] of Object.entries(props)) {
+			const props = this.#appender.layoutProps(false);
+			for (const [key, value] of Object.entries(props)) {
 				this.#map.setLayoutProperty("points", key, value);
 			}
 		});
@@ -389,14 +388,14 @@ class StatusText {
 	onAdd(map) {
 		this.#map = map;
 
-		let div = document.createElement("div");
+		const div = document.createElement("div");
 		div.className = "mapboxgl-ctrl status";
 
 		div.addEventListener("click", () => {
-			let features = this.#map.queryRenderedFeatures({layers: ["points"]});
+			const features = this.#map.queryRenderedFeatures({layers: ["points"]});
 
-			let llb = new mapboxgl.LngLatBounds();
-			for (let feature of features) {
+			const llb = new mapboxgl.LngLatBounds();
+			for (const feature of features) {
 				llb.extend(feature.geometry.coordinates);
 			}
 
@@ -405,7 +404,7 @@ class StatusText {
 			});
 		});
 
-		let span = document.createElement("span");
+		const span = document.createElement("span");
 		span.id = "status";
 		span.textContent = "loading...";
 
@@ -424,7 +423,7 @@ class InfoText {
 	#container;
 
 	onAdd() {
-		let textarea = document.createElement("textarea");
+		const textarea = document.createElement("textarea");
 		textarea.id = "info";
 		textarea.className = "mapboxgl-ctrl";
 		textarea.readOnly = true;
@@ -468,18 +467,18 @@ class PointsAppender {
 		const color1 = "rgba(0 0 0 / 10%)";
 		const color2 = "rgb(255 255 255)";
 
-		let canvas = document.createElement("canvas");
+		const canvas = document.createElement("canvas");
 		canvas.width = 37;
 		canvas.height = 21;
 
-		let context = canvas.getContext("2d", {
+		const context = canvas.getContext("2d", {
 			alpha: true,
 			desynchronized: true
 		});
 
 		context.lineJoin = "round";
 
-		let path = new Path2D(`M 13 6 h 18 l -9 9 z`);
+		const path = new Path2D(`M 13 6 h 18 l -9 9 z`);
 
 		context.strokeStyle = color1;
 		context.lineWidth = 12;
@@ -492,7 +491,7 @@ class PointsAppender {
 		context.fillStyle = color2;
 		context.fill(path);
 
-		let bitmap = await createImageBitmap(canvas);
+		const bitmap = await createImageBitmap(canvas);
 
 		if (this.#map.hasImage(id)) {
 			console.warn("Already loaded", id);
@@ -507,8 +506,8 @@ class PointsAppender {
 		const color1 = "rgba(0 0 0 / 10%)";
 		const color2 = "rgb(255 255 255)";
 
-		for (let feature of this.#geoJson.features) {
-			let filename = feature.properties.icon;
+		for (const feature of this.#geoJson.features) {
+			const filename = feature.properties.icon;
 
 			this.#map.loadImage(filename, async (error, image) => {
 				if (error) {
@@ -516,19 +515,19 @@ class PointsAppender {
 					return;
 				}
 
-				let aspectRatio = image.width / image.height;
+				const aspectRatio = image.width / image.height;
 
-				let boxWidth = 208;
-				let boxHeight = Math.floor(boxWidth / aspectRatio);
+				const boxWidth = 208;
+				const boxHeight = Math.floor(boxWidth / aspectRatio);
 
-				let canvasWidth = boxWidth;
-				let canvasHeight = boxHeight + 19;
+				const canvasWidth = boxWidth;
+				const canvasHeight = boxHeight + 19;
 
-				let canvas = document.createElement("canvas");
+				const canvas = document.createElement("canvas");
 				canvas.width = canvasWidth;
 				canvas.height = canvasHeight;
 
-				let context = canvas.getContext("2d", {
+				const context = canvas.getContext("2d", {
 					alpha: true,
 					desynchronized: true
 				});
@@ -574,7 +573,7 @@ class PointsAppender {
 				context.fillStyle = color1;
 				context.fillRect(8, boxHeight - 4, 32, 4);
 
-				let bitmap = await createImageBitmap(canvas);
+				const bitmap = await createImageBitmap(canvas);
 
 				if (this.#map.hasImage(filename)) {
 					console.warn("Already loaded", filename);
@@ -591,8 +590,8 @@ class PointsAppender {
 			this.#layoutPropsIndex %= this.#layoutProps.length;
 		}
 
-		let props = {};
-		for (let [key, value] of Object.entries(this.#layoutProps[this.#layoutPropsIndex])) {
+		const props = {};
+		for (const [key, value] of Object.entries(this.#layoutProps[this.#layoutPropsIndex])) {
 			if (value !== null || first === false) {
 				props[key] = value;
 			}
@@ -610,7 +609,7 @@ class PointsAppender {
 		}
 
 		if (this.#map.getLayer("points") === undefined) {
-			let props = this.layoutProps(true);
+			const props = this.layoutProps(true);
 
 			this.#map.addLayer({
 				id: "points",
@@ -643,30 +642,30 @@ class PointsAppender {
 
 	bindEventListeners() {
 		this.#map.on("mouseenter", "points", () => {
-			let canvas = this.#map.getCanvas();
+			const canvas = this.#map.getCanvas();
 			canvas.style.cursor = "pointer";
 		});
 
 		this.#map.on("mouseleave", "points", () => {
-			let canvas = this.#map.getCanvas();
+			const canvas = this.#map.getCanvas();
 			canvas.style.cursor = "";
 		});
 
 		this.#map.on("click", "points", (event) => {
-			let props = event.features[0].properties;
+			const props = event.features[0].properties;
 
-			let div = document.createElement("div");
+			const div = document.createElement("div");
 			div.className = "modal";
 
 			div.addEventListener("click", () => {
 				div.remove();
 			});
 
-			let img = document.createElement("img");
+			const img = document.createElement("img");
 			img.className = "fit";
 			img.alt = props.text;
 
-			if (props.hasOwnProperty("orig")) {
+			if (Object.hasOwn(props, "orig")) {
 				img.src = props.orig;
 			} else {
 				img.src = props.icon;
@@ -678,36 +677,36 @@ class PointsAppender {
 	}
 }
 
-let divMap = document.getElementById("map");
+const divMap = document.getElementById("map");
 if (divMap === null) {
-	window.alert("map container does not exist");
+	window.alert("no map container");
 	throw Error();
 }
 
-let params = new URLSearchParams(document.location.search);
-let baseUrl = params.get("base");
+const params = new URLSearchParams(document.location.search);
+const baseUrl = params.get("base");
 
 if (baseUrl === null || baseUrl.match(/^\/[^/].*\/$/) === null) {
 	window.alert("invalid base URL");
 	throw Error();
 }
 
-let response = await fetch(baseUrl + "map.json");
-let json = await response.json();
+const response = await fetch(baseUrl + "map.json");
+const json = await response.json();
 
 document.title = document.title + " " + json.name;
 
-let devMode = params.get("dev") !== null;
+const devMode = params.get("dev") !== null;
 
-let geoJson = Util.convertToGeoJson(json.points, baseUrl);
+const geoJson = Util.convertToGeoJson(json.points, baseUrl);
 if (devMode) {
 	//console.info(JSON.stringify(geoJson, null, "\t"));
 }
 
-let llbAway = new mapboxgl.LngLatBounds();
-let llbNear = new mapboxgl.LngLatBounds();
+const llbAway = new mapboxgl.LngLatBounds();
+const llbNear = new mapboxgl.LngLatBounds();
 
-for (let feature of geoJson.features) {
+for (const feature of geoJson.features) {
 	if (feature.properties.away) {
 		llbAway.extend(feature.geometry.coordinates);
 	} else {
@@ -715,7 +714,7 @@ for (let feature of geoJson.features) {
 	}
 }
 
-let llbMerged = new mapboxgl.LngLatBounds();
+const llbMerged = new mapboxgl.LngLatBounds();
 llbMerged.extend(llbAway);
 llbMerged.extend(llbNear);
 
@@ -737,7 +736,7 @@ const map = new mapboxgl.Map({
 
 //map.showCollisionBoxes = true;
 
-let appender = new PointsAppender(map, geoJson);
+const appender = new PointsAppender(map, geoJson);
 appender.bindEventListeners();
 appender.loadImages();
 
@@ -746,7 +745,7 @@ map.on("load", () => {
 });
 
 map.on("idle", () => {
-	let span = document.getElementById("status");
+	const span = document.getElementById("status");
 	if (span === null) {
 		return;
 	}
@@ -755,14 +754,14 @@ map.on("idle", () => {
 		return;
 	}
 
-	let features = map.queryRenderedFeatures({layers: ["points"]});
+	const features = map.queryRenderedFeatures({layers: ["points"]});
 	span.textContent = `${features.length} / ${geoJson.features.length}`;
 });
 
 /*
 map.addControl(
 	new mapboxgl.ScaleControl(),
-	"top-left"
+	"bottom-left"
 );
 */
 
@@ -785,7 +784,7 @@ map.addControl(
 );
 
 map.addControl(
-	new DisplayAllControl(llbMerged),
+	new ShowAllControl(llbMerged),
 	"bottom-right"
 );
 
@@ -795,7 +794,7 @@ map.addControl(
 );
 
 map.addControl(
-	new TogglePicturesControl(appender),
+	new ImageOnOffControl(appender),
 	"bottom-right"
 );
 
@@ -827,10 +826,10 @@ if (devMode) {
 }
 
 if (devMode) {
-	let div = document.createElement("div");
+	const div = document.createElement("div");
 	div.className = "square";
 
-	let marker = new mapboxgl.Marker({
+	const marker = new mapboxgl.Marker({
 		anchor: "top-left",
 		draggable: true,
 		element: div,
@@ -840,16 +839,16 @@ if (devMode) {
 	marker.addTo(map);
 
 	marker.on("dragend", (event) => {
-		let ll = Util.goodLngLat(map, event.target.getLngLat());
-		let element = document.getElementById("info");
+		const ll = Util.goodLngLat(map, event.target.getLngLat());
+		const element = document.getElementById("info");
 		element.value = `${ll.lat}, ${ll.lng}`;
 		element.select();
 	});
 
 	map.on("contextmenu", (event) => {
 		marker.setLngLat(event.lngLat);
-		let ll = Util.goodLngLat(map, event.lngLat);
-		let element = document.getElementById("info");
+		const ll = Util.goodLngLat(map, event.lngLat);
+		const element = document.getElementById("info");
 		element.value = `${ll.lat}, ${ll.lng}`;
 		element.select();
 	});
