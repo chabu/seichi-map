@@ -281,7 +281,7 @@ class ShowAllControl {
 		button.type = "button";
 
 		const icon = document.createElement("span");
-		icon.className = "mapboxgl-ctrl-icon icon-world";
+		icon.className = "mapboxgl-ctrl-icon icon-dialpad";
 		icon.title = "show all markers";
 
 		button.addEventListener("click", () => {
