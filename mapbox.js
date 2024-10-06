@@ -1,4 +1,4 @@
-const version = "0.94a";
+const version = "0.95a";
 
 class Util {
 	static styles = [
@@ -76,20 +76,20 @@ class Util {
 
 		switch (category) {
 			case "ep":
-				groupLabel = `${numseq}話`;
+				groupLabel = `${numseq}話 `;
 				break;
 			default:
-				groupLabel = `${category.toLowerCase()}${numseq},`;
+				groupLabel = `${category.toLowerCase()}${numseq} » `;
 				break;
 		}
 
 		if (hour === null) {
 			const padsec = second.padStart(2, "0");
-			return `${groupLabel} ${minute}:${padsec}`;
+			return `${groupLabel}${minute}:${padsec}`;
 		} else {
 			const padsec = second.padStart(2, "0");
 			const padmin = minute.padStart(2, "0");
-			return `${groupLabel} ${hour}:${padmin}:${padsec}`;
+			return `${groupLabel}${hour}:${padmin}:${padsec}`;
 		}
 	}
 
