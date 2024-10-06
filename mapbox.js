@@ -79,7 +79,7 @@ class Util {
 				groupLabel = `${numseq}話 `;
 				break;
 			default:
-				groupLabel = `${category.toLowerCase()}${numseq} » `;
+				groupLabel = `${category.toLowerCase()}${numseq}·`;
 				break;
 		}
 
