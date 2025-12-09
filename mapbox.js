@@ -1,6 +1,6 @@
-const version = "0.95a";
+const version = "0.96a";
 
-class Util {
+class Common {
 	static styles = [
 		// Mapbox Standard
 		{
@@ -12,7 +12,8 @@ class Util {
 					lightPreset: "night",
 					show3dObjects: false,
 				}
-			}
+			},
+			addTerrain: false,
 		},
 
 		// Mapbox Standard Satellite
@@ -23,7 +24,8 @@ class Util {
 					font: "Noto Sans CJK JP",
 					lightPreset: "dusk",
 				}
-			}
+			},
+			addTerrain: true,
 		}
 	];
 
@@ -183,7 +185,7 @@ class Button1Control {
 		button.textContent = "Show Pos";
 		button.addEventListener("click", () => {
 			const element = document.getElementById("info");
-			element.value = Util.positionText(this.#map, "Show Pos");
+			element.value = Common.positionText(this.#map, "Show Pos");
 			element.select();
 		});
 
@@ -286,7 +288,7 @@ class ShowAllControl {
 
 		button.addEventListener("click", () => {
 			this.#map.fitBounds(this.#lngLatBounds, {
-				padding: Util.paddingOptions
+				padding: Common.paddingOptions
 			});
 		});
 
@@ -332,13 +334,28 @@ class MapStyleControl {
 		button.addEventListener("click", () => {
 			this.#stylesIndex++;
 			this.#stylesIndex %= this.#styles.length;
+			const selectedStyle = this.#styles[this.#stylesIndex];
+
 			this.#map.setStyle(
-				this.#styles[this.#stylesIndex].url,
-				{config: this.#styles[this.#stylesIndex].config}
+				selectedStyle.url,
+				{config: selectedStyle.config}
 			);
 
 			const span = document.getElementById("status");
 			span.textContent = "loading...";
+
+			if (selectedStyle.addTerrain) {
+				this.#map.once("style.load", () => {
+					this.#map.addSource("mapbox-dem", {
+						type: "raster-dem",
+						url: "mapbox://mapbox.mapbox-terrain-dem-v1",
+					});
+					this.#map.setTerrain({
+						source: "mapbox-dem",
+						exaggeration: 1.0,
+					});
+				});
+			}
 
 			this.#appender.loadImages();
 			this.#map.once("idle", () => {
@@ -412,6 +429,7 @@ class StatusText {
 		div.className = "mapboxgl-ctrl status";
 
 		div.addEventListener("click", () => {
+			// TODO: replace with querySourceFeatures()
 			const features = this.#map.queryRenderedFeatures({layers: ["points"]});
 
 			const llb = new mapboxgl.LngLatBounds();
@@ -420,7 +438,7 @@ class StatusText {
 			}
 
 			this.#map.fitBounds(llb, {
-				padding: Util.paddingOptions
+				padding: Common.paddingOptions
 			});
 		});
 
@@ -719,7 +737,7 @@ document.title = document.title + " " + json.name;
 
 const devMode = params.get("dev") !== null;
 
-const geoJson = Util.convertToGeoJson(json.points, baseUrl);
+const geoJson = Common.convertToGeoJson(json.points, baseUrl);
 if (devMode) {
 	//console.info(JSON.stringify(geoJson, null, "\t"));
 }
@@ -739,6 +757,7 @@ const llbMerged = new mapboxgl.LngLatBounds();
 llbMerged.extend(llbAway);
 llbMerged.extend(llbNear);
 
+// FIXME: not working since v3.17.0 (Sanitize attributions in AttributionControl)
 json.copyrights.unshift(
 	'<a href="/licenses.txt" target="_blank">Licenses</a>'
 );
@@ -746,13 +765,13 @@ json.copyrights.unshift(
 const map = new mapboxgl.Map({
 	accessToken: divMap.dataset.token,
 	bounds: llbNear,
-	config: Util.styles[0].config,
+	config: Common.styles[0].config,
 	container: divMap,
 	customAttribution: json.copyrights,
-	fitBoundsOptions: {padding: Util.paddingOptions},
+	fitBoundsOptions: {padding: Common.paddingOptions},
 	language: "auto",
 	//performanceMetricsCollection: false,
-	style: Util.styles[0].url,
+	style: Common.styles[0].url,
 	worldview: "JP",
 });
 
@@ -762,6 +781,7 @@ const appender = new PointsAppender(map, geoJson);
 appender.bindEventListeners();
 appender.loadImages();
 
+// TODO: use style.load
 map.once("load", () => {
 	appender.loadSourceAndLayer();
 });
@@ -776,6 +796,7 @@ map.on("idle", () => {
 		return;
 	}
 
+	// TODO: replace with querySourceFeatures()
 	const features = map.queryRenderedFeatures({layers: ["points"]});
 	span.textContent = `${features.length} / ${geoJson.features.length}`;
 });
@@ -811,7 +832,7 @@ map.addControl(
 );
 
 map.addControl(
-	new MapStyleControl(Util.styles, appender),
+	new MapStyleControl(Common.styles, appender),
 	"bottom-right"
 );
 
@@ -861,7 +882,7 @@ if (devMode) {
 	marker.addTo(map);
 
 	marker.on("dragend", (event) => {
-		const ll = Util.goodLngLat(map, event.target.getLngLat());
+		const ll = Common.goodLngLat(map, event.target.getLngLat());
 		const element = document.getElementById("info");
 		element.value = `${ll.lat}, ${ll.lng}`;
 		element.select();
@@ -869,7 +890,7 @@ if (devMode) {
 
 	map.on("contextmenu", (event) => {
 		marker.setLngLat(event.lngLat);
-		const ll = Util.goodLngLat(map, event.lngLat);
+		const ll = Common.goodLngLat(map, event.lngLat);
 		const element = document.getElementById("info");
 		element.value = `${ll.lat}, ${ll.lng}`;
 		element.select();
