@@ -1,4 +1,4 @@
-const version = "0.96a";
+const version = "0.9.7a";
 
 class Common {
 	static styles = [
@@ -722,7 +722,7 @@ if (divMap === null) {
 	throw Error();
 }
 
-const params = new URLSearchParams(document.location.search);
+const params = new URLSearchParams(window.location.search);
 const baseUrl = params.get("base");
 
 if (baseUrl === null || baseUrl.match(/^\/[^/].*\/$/) === null) {
@@ -757,9 +757,8 @@ const llbMerged = new mapboxgl.LngLatBounds();
 llbMerged.extend(llbAway);
 llbMerged.extend(llbNear);
 
-// FIXME: not working since v3.17.0 (Sanitize attributions in AttributionControl)
 json.copyrights.unshift(
-	'<a href="/licenses.txt" target="_blank">Licenses</a>'
+	`<a href="${window.location.origin}/licenses.txt">Licenses</a>`
 );
 
 const map = new mapboxgl.Map({
